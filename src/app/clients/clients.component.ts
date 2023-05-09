@@ -3,17 +3,32 @@ import { ClientService } from './../client.service';
 import { Client } from './../client';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-clients',
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css']
 })
-export class ClientsComponent implements OnInit{//  LEMBRAR DE COLOCAR IMPLEMENTS ONIT
+export class ClientsComponent implements OnInit{
+//  LEMBRAR DE COLOCAR IMPLEMENTS ONIT
 
   clients: Client[] = [];
+  formGroupClient : FormGroup;
 
-  constructor( private clientService: ClientService){ }//INJEÇÃO DE DEPENDENCIA -
+  constructor( private clientService: ClientService, private formBuilder: FormBuilder){//INJEÇÃO DE DEPENDENCIA -
+    this.formGroupClient = formBuilder.group({
+      id : [''],
+      name : [''],
+      email : ['']
+    });//na hora de cadastrar de fato, não colocar a variável id
+  }
+
+
+
+
+
+
   ngOnInit(): void {
     this.loadClients();
   }
@@ -25,6 +40,18 @@ export class ClientsComponent implements OnInit{//  LEMBRAR DE COLOCAR IMPLEMENT
         error: () => console.log("Erro ao chamar o endpoint")
       }
     )
+    }
+
+    save(){ //se devolve um observable é necessário um subscribe
+     this.clientService.save(this.formGroupClient.value).subscribe(
+      {
+        //a resposta chega pelo next | client é data
+        next : data => { //tratando o retorno do save |
+          this.clients.push(data); //atualiza o array
+          this.formGroupClient.reset();
+        }
+      }
+     )
     }
 }
 
