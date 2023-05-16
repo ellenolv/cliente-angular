@@ -17,12 +17,13 @@
 </div>
 
 
-<table class="table">
+<table class="table container">
   <thead>
     <tr>
       <th scope="col">Id</th>
       <th scope="col">Name</th>
       <th scope="col">Email</th>
+      <th scope="col">Opções</th>
     </tr>
   </thead>
   <tbody>
@@ -30,6 +31,10 @@
       <th scope="row">{{client.id}}</th>
       <td>{{client.name}}</td>
       <td>{{client.email}}</td>
+      <td>
+        <button class="btn btn-primary me-1" (click)="remove(client)"> Excluir </button>
+        <button class="btn btn-danger" (click)="edit(client)"> Editar </button>
+      </td>
     </tr>
   </tbody>
 </table>

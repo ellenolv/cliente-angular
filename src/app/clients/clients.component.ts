@@ -15,6 +15,7 @@ export class ClientsComponent implements OnInit{
 
   clients: Client[] = [];
   formGroupClient : FormGroup;
+  isEditing:  boolean = false;
 
   constructor( private clientService: ClientService, private formBuilder: FormBuilder){//INJEÇÃO DE DEPENDENCIA -
     this.formGroupClient = formBuilder.group({
@@ -22,6 +23,7 @@ export class ClientsComponent implements OnInit{
       name : [''],
       email : ['']
     });//na hora de cadastrar de fato, não colocar a variável id
+    //Form Group Client é o que
   }
 
 
@@ -43,15 +45,45 @@ export class ClientsComponent implements OnInit{
     }
 
     save(){ //se devolve um observable é necessário um subscribe
-     this.clientService.save(this.formGroupClient.value).subscribe(
-      {
-        //a resposta chega pelo next | client é data
-        next : data => { //tratando o retorno do save |
-          this.clients.push(data); //atualiza o array
-          this.formGroupClient.reset();
-        }
+      if(this.isEditing){
+
+        this.clientService.update(this.formGroupClient.value).subscribe(
+          {
+            next: () =>  {
+              this.loadClients();
+              this.formGroupClient.reset();
+              this.isEditing = false;
+            }
+          }
+        )
+
       }
-     )
+      else{
+        this.clientService.save(this.formGroupClient.value).subscribe(
+          {
+            //a resposta chega pelo next | client é data
+            next : data => { //tratando o retorno do save |
+              this.clients.push(data); //atualiza o array
+              this.formGroupClient.reset();
+            }
+          }
+         );
+      }
+    }
+
+
+
+    remove(client: Client):void{
+      this.clientService.remove(client).subscribe(
+        {
+          //a resposta chega pelo next, ou seja, se tudo for feito com sucesso
+          next:() => this.loadClients()
+        });
+    }
+
+    edit(client: Client):void{
+      this.formGroupClient.setValue(client);//
+      this.isEditing = true;
     }
 }
 
